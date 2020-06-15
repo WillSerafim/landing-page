@@ -14,7 +14,7 @@ export default function Home() {
 
           <Form inline className="ml-auto">
             <Button variant="outline-light" className="mr-sm-2">Login</Button>
-            <Button variant="outline-success">Dowload App</Button>
+            <Button variant="outline-success">Download App</Button>
           </Form>
       </Navbar>
 
