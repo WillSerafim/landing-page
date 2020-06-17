@@ -1,10 +1,23 @@
-import React from 'react';
+import React, {useState} from 'react';
+import {Navbar, Button, Form, Row, Modal, DropdownButton, Dropdown } from 'react-bootstrap';
+
 import './index.css';
 import imgDownload from '../../assets/img/img_download.png'
 import logo from '../../assets/img/B.png'
-import {Navbar, Button, Form, Row} from 'react-bootstrap';
+// import ModalLogin from '.././../components/login/index';
 
 export default function Home() {
+  const [show, setShow] = useState(false);
+  const [email, setEmail] = useState("");
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
+  function handleSubmit () {
+    localStorage.setItem('session', email);
+    handleClose();
+  }
+
   return (
     <>
       <Navbar bg="dark" variant="dark">
@@ -13,7 +26,19 @@ export default function Home() {
         BarApp</Navbar.Brand>
 
           <Form inline className="ml-auto">
-            <Button variant="outline-light" className="mr-sm-2">Login</Button>
+            <Button variant="outline-light" className="mr-sm-2" onClick={handleShow}>Login</Button>
+
+            {localStorage.getItem('session') &&
+              <>
+                <DropdownButton className="mr-2" variant="outline-light" id="dropdown-basic-button" title="Actions">
+                  <Dropdown.Item href="/users">List users</Dropdown.Item>
+                  <Dropdown.Item href="#">Add users</Dropdown.Item>
+                  <Dropdown.Divider/>
+                  <Dropdown.Item href="/" onClick={() => localStorage.clear()}>logout</Dropdown.Item>
+                </DropdownButton>
+              </>
+            }
+
             <Button variant="outline-success">Download App</Button>
           </Form>
       </Navbar>
@@ -54,6 +79,33 @@ export default function Home() {
       </div>
       
       <Navbar strick="bottom" bg="dark"/>
+
+      {/* <ModalLogin {...props}/> */}
+
+      <Modal  size="sm" show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Login</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+              <Form.Group controlId="email">
+                <Form.Label>E-mail</Form.Label>
+                <Form.Control type="email"  onChange={e => setEmail(e.target.value)}/>
+              </Form.Group>
+
+              <Form.Group controlId="password">
+                <Form.Label>Senha</Form.Label>
+                <Form.Control type="password" />
+              </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="success" onClick={handleSubmit}>
+            Login
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      
     </>
   );
 }
