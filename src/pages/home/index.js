@@ -1,5 +1,7 @@
 import React, {useState} from 'react';
 import {Navbar, Button, Form, Row, Modal, DropdownButton, Dropdown } from 'react-bootstrap';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import './index.css';
 import imgDownload from '../../assets/img/img_download.png'
@@ -9,37 +11,67 @@ import logo from '../../assets/img/B.png'
 export default function Home() {
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [error, setError] = useState(false);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
   function handleSubmit () {
-    localStorage.setItem('session', email);
-    handleClose();
+    if (localStorage.hasOwnProperty("users")) {
+      let data = JSON.parse(localStorage.getItem("users"));
+      let name = '';
+
+      data.forEach(element => {
+        if (element['email'] === email) {
+          name = element['name'];
+          handleClose();
+        }
+      });
+
+      if (name !== '') {
+        setName(name);
+      }else {
+        setError(true);
+      }
+    } 
+  }
+
+  if (error) {
+    toast.error('Usuário não cadastrado!');
+    setError(false);
   }
 
   return (
     <>
+      <ToastContainer />
       <Navbar bg="dark" variant="dark">
         <Navbar.Brand href="/">      
-          <img alt="" src={logo} width="30" height="30" className="d-inline-block align-top"/>
-        BarApp</Navbar.Brand>
+          <img alt="" src={logo} width="30" height="30" className="d-inline-block align-top mr-2"/>
+          Barber Agendamentos
+        </Navbar.Brand>
 
           <Form inline className="ml-auto">
-            <Button variant="outline-light" className="mr-sm-2" onClick={handleShow}>Login</Button>
-
-            {localStorage.getItem('session') &&
+            
+            {name !== "" ?
               <>
                 <DropdownButton className="mr-2" variant="outline-light" id="dropdown-basic-button" title="Actions">
-                  <Dropdown.Item href="/users">List users</Dropdown.Item>
-                  <Dropdown.Item href="#">Add users</Dropdown.Item>
+                  <Dropdown.Item href="/users" target="_blank">List users</Dropdown.Item>
+                  <Dropdown.Item href="/new-user" target="_blank">Add users</Dropdown.Item>
                   <Dropdown.Divider/>
-                  <Dropdown.Item href="/" onClick={() => localStorage.clear()}>logout</Dropdown.Item>
+                  <Dropdown.Item href="/" target="_blank" onClick={() => localStorage.clear()}>logout</Dropdown.Item>
                 </DropdownButton>
+
+                <Navbar.Text>
+                  Logado como: {name}
+                </Navbar.Text>
+              </>
+            : 
+              <>
+                <Button variant="outline-light" className="mr-sm-2" onClick={handleShow}>Login</Button>
+                <Button variant="outline-light" target="_blank" className="mr-sm-2" href="/new-user">Cadastrar</Button>
               </>
             }
-
-            <Button variant="outline-success">Download App</Button>
           </Form>
       </Navbar>
 
@@ -95,7 +127,7 @@ export default function Home() {
 
               <Form.Group controlId="password">
                 <Form.Label>Senha</Form.Label>
-                <Form.Control type="password" />
+                <Form.Control type="password"/>
               </Form.Group>
           </Form>
         </Modal.Body>
@@ -105,7 +137,6 @@ export default function Home() {
           </Button>
         </Modal.Footer>
       </Modal>
-      
     </>
   );
 }
