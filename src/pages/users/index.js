@@ -23,6 +23,10 @@ export default function Users() {
     localStorage.setItem("users", JSON.stringify(data));
   }
 
+  function updateUser(position) {
+    history.push('/new-user', position);
+ }
+
   return (
     <>
       <Container>
@@ -47,7 +51,7 @@ export default function Users() {
                     <td>{user.email}</td>
                     <td>{user.barber ? 'sim': 'não'}</td>
                     <td>
-                      <a href="#">
+                      <a onClick={() => updateUser(i)}>
                         <i className="fa fa-pencil text-dark mr-3" aria-hidden="true" style={{cursor: 'pointer'}}></i>
                       </a>
                       <a  onClick={() => deleteUser(i)} >
