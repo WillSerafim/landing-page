@@ -1,12 +1,12 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable no-unused-expressions */
 import React, {useState, useEffect} from 'react';
-import {Table, Container} from 'react-bootstrap';
-
-import 'font-awesome/css/font-awesome.min.css';
+import {Table, Container, Button} from 'react-bootstrap';
+import {useHistory } from 'react-router-dom';
 
 export default function Users() {
   const [users, setUsers] = useState([]);
+  const history = useHistory();
 
   useEffect(() => {
     if (localStorage.hasOwnProperty("users")) {
@@ -15,13 +15,21 @@ export default function Users() {
   }, []);
 
   function deleteUser(position) {
-    console.log(position);
+     const data = users.filter((user, i) => {
+      return i !== position;
+    });
+    
+    setUsers(data);
+    localStorage.setItem("users", JSON.stringify(data));
   }
 
   return (
     <>
       <Container>
         <div className="mt-5">
+          <Button variant="light" className="mb-5" onClick={() => history.push('/')}>
+            <i className="fa fa-arrow-left text-dark" aria-hidden="true"></i>
+          </Button>
           <Table striped bordered hover>
             <thead>
               <tr className="text-center">
@@ -42,8 +50,8 @@ export default function Users() {
                       <a href="#">
                         <i className="fa fa-pencil text-dark mr-3" aria-hidden="true" style={{cursor: 'pointer'}}></i>
                       </a>
-                      <a  href='#'>
-                        <i className="fa fa-trash text-dark" aria-hidden="true" style={{cursor: 'pointer'}} onClick={deleteUser(i)}></i>
+                      <a  onClick={() => deleteUser(i)} >
+                        <i className="fa fa-trash text-dark" aria-hidden="true" style={{cursor: 'pointer'}} ></i>
                       </a>
                     </td>
                   </tr>

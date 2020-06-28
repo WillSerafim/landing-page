@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Navbar, Button, Form, Row, Modal, DropdownButton, Dropdown } from 'react-bootstrap';
+import {useHistory} from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 import './index.css';
 import imgDownload from '../../assets/img/img_download.png'
@@ -13,14 +13,29 @@ export default function Home() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState(false);
+  const history = useHistory();
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+
+  useEffect(() => {
+    if (localStorage.hasOwnProperty("session")) {
+      let dataUser = JSON.parse(localStorage.getItem("users"));
+      let dataSession = JSON.parse(localStorage.getItem("session"));
+
+      dataUser.forEach(element => {
+        if (element['email'] === dataSession[0].email) {
+          setName(element['name']);
+        }
+      });
+    }
+  }, []);
 
   function handleSubmit () {
     if (localStorage.hasOwnProperty("users")) {
       let data = JSON.parse(localStorage.getItem("users"));
       let name = '';
+      let session = [];
 
       data.forEach(element => {
         if (element['email'] === email) {
@@ -34,6 +49,12 @@ export default function Home() {
       }else {
         setError(true);
       }
+
+      session.push({
+        email: email
+      });
+  
+      localStorage.setItem("session", JSON.stringify(session));
     } 
   }
 
@@ -56,10 +77,10 @@ export default function Home() {
             {name !== "" ?
               <>
                 <DropdownButton className="mr-2" variant="outline-light" id="dropdown-basic-button" title="Actions">
-                  <Dropdown.Item href="/users" target="_blank">List users</Dropdown.Item>
-                  <Dropdown.Item href="/new-user" target="_blank">Add users</Dropdown.Item>
+                  <Dropdown.Item onClick={() => history.push('/users')}>List users</Dropdown.Item>
+                  <Dropdown.Item onClick={() => history.push('/new-user')}>Add users</Dropdown.Item>
                   <Dropdown.Divider/>
-                  <Dropdown.Item href="/" target="_blank" onClick={() => localStorage.clear()}>logout</Dropdown.Item>
+                  <Dropdown.Item href="/" onClick={() => localStorage.removeItem('session')}>logout</Dropdown.Item>
                 </DropdownButton>
 
                 <Navbar.Text>
@@ -69,7 +90,7 @@ export default function Home() {
             : 
               <>
                 <Button variant="outline-light" className="mr-sm-2" onClick={handleShow}>Login</Button>
-                <Button variant="outline-light" target="_blank" className="mr-sm-2" href="/new-user">Cadastrar</Button>
+                <Button variant="outline-light" className="mr-sm-2" href="/new-user">Cadastrar</Button>
               </>
             }
           </Form>
